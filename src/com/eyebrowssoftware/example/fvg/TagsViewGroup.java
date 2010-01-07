@@ -1,7 +1,9 @@
 /**
  * 
  */
-package com.example.fvg;
+package com.eyebrowssoftware.example.fvg;
+
+import com.example.fvg.R;
 
 import junit.framework.Assert;
 import android.content.Context;

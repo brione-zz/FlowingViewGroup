@@ -8,5 +8,6 @@
 		<attr name="android:paddingLeft" type="dimension" />
 		<attr name="android:paddingTop" type="dimension" />
 		<attr name="android:paddingBottom" type="dimension" />
+		<!--  <attr name="defaultRows" type="integer" />  -->
 	</declare-styleable>
 </resources>

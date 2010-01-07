@@ -1,4 +1,6 @@
-package com.example.fvg;
+package com.eyebrowssoftware.example.fvg;
+
+import com.example.fvg.R;
 
 import android.app.Activity;
 import android.os.Bundle;
