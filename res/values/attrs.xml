@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="com.example.fvg.TagsViewGroup">
+		<attr name="android:verticalSpacing"  type="dimension" />
+		<attr name="android:horizontalSpacing"  type="dimension" />
+		<attr name="android:padding" type="dimension" />
+		<attr name="android:paddingRight" type="dimension" />
+		<attr name="android:paddingLeft" type="dimension" />
+		<attr name="android:paddingTop" type="dimension" />
+		<attr name="android:paddingBottom" type="dimension" />
+	</declare-styleable>
+</resources>
