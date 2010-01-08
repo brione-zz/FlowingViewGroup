@@ -3,14 +3,15 @@
 	<style name="tags" >
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="padding">5sp</item>
-		<item name="verticalSpacing">10sp</item>
-		<item name="horizontalSpacing">10sp</item>
+		<item name="android:padding">10dp</item>
+		<item name="android:layout_margin">10dp</item>
+		<item name="verticalSpacing">10dp</item>
+		<item name="horizontalSpacing">10dp</item>
 		<item name="minRows">4</item>
 	</style>
 	<style name="tag_items"  >
-		<item name="android:textSize">10.0sp</item>
-		<item name="android:padding">2sp</item>
+		<item name="android:textSize">10.0dp</item>
+		<item name="android:padding">2dp</item>
 		<item name="android:gravity">center</item>
 		<item name="android:background">#666</item> 
 		<item name="android:textColor">#FFF</item>

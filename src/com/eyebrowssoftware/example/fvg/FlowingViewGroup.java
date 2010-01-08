@@ -8,6 +8,33 @@ import android.widget.ArrayAdapter;
 
 public class FlowingViewGroup extends ListActivity {
 
+	/** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        TagsViewGroup tvg = (TagsViewGroup) findViewById(R.id.tags);
+        ArrayAdapter<String> saa = new ArrayAdapter<String>(this, R.layout.text_view, mTitles1);
+        tvg.setAdapter(saa);
+        ArrayAdapter<String[]> saaa = new ArrayAdapter<String[]>(this, R.layout.tags_view_group, mLibraries) {
+        	
+        	@Override
+        	public View getView(int position, View convertView, ViewGroup parent) {
+        		TagsViewGroup tgv;
+        		if(convertView == null) {
+        			tgv = (TagsViewGroup) FlowingViewGroup.this.getLayoutInflater().inflate(R.layout.tags_view_group, null);
+        		} else
+        			tgv = (TagsViewGroup) convertView;
+        		ArrayAdapter<String> aa = new ArrayAdapter<String>(FlowingViewGroup.this, 
+        				R.layout.text_view, this.getItem(position));
+        		tgv.setAdapter(aa);
+        		return tgv;
+        	}
+        };
+        this.setListAdapter(saaa);
+    }
+
     private static final String[] mTitles1 = 
     {
         "Henry IV (1)",   
@@ -100,30 +127,5 @@ public class FlowingViewGroup extends ListActivity {
     	mTitles1, mTitles2, mTitles3, mTitles4, mTitles5, mTitles6, mTitles7,
     };
 	
-	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
-        TagsViewGroup tvg = (TagsViewGroup) findViewById(R.id.tags);
-        ArrayAdapter<String> saa = new ArrayAdapter<String>(this, R.layout.text_view, mTitles1);
-        tvg.setAdapter(saa);
-        ArrayAdapter<String[]> saaa = new ArrayAdapter<String[]>(this, R.layout.tags_view_group, mLibraries) {
-        	
-        	@Override
-        	public View getView(int position, View convertView, ViewGroup parent) {
-        		TagsViewGroup tgv;
-        		if(convertView == null) {
-        			tgv = (TagsViewGroup) FlowingViewGroup.this.getLayoutInflater().inflate(R.layout.tags_view_group, null);
-        		} else
-        			tgv = (TagsViewGroup) convertView;
-        		ArrayAdapter<String> aa = new ArrayAdapter<String>(FlowingViewGroup.this, 
-        				R.layout.text_view, this.getItem(position));
-        		tgv.setAdapter(aa);
-        		return tgv;
-        	}
-        };
-        this.setListAdapter(saaa);
-    }
+
 }

@@ -25,59 +25,76 @@ public class TagsViewGroup extends ViewGroup {
 	private int mHorizontalSpacing = 0;
 	private int mVerticalSpacing = 0;
 	private int mTextHeight = -1;
-	private int mTopPadding;
-	private int mBottomPadding;
-	private int mLeftPadding;
-	private int mRightPadding;
+	private int mPaddingTop;
+	private int mPaddingBottom;
+	private int mPaddingLeft;
+	private int mPaddingRight;
 	private int mMinRows;
 
 	
-	private static final ViewGroup.LayoutParams PARAMS = 
-		new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT); 
+	private ViewGroup.MarginLayoutParams params = 
+		new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT); 
 
 	public TagsViewGroup(Context context) {
 		super(context);
+		initTagsViewGroup();
 	}
 	
 	public TagsViewGroup(Context context, AttributeSet attrs) {
-		
-		this(context, attrs, R.style.tags);
+		super(context, attrs);
+		initTagsViewGroup();
+		initFromAttributes(context, attrs, R.style.tags);
 	}
 
 	public TagsViewGroup(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		initTagsViewGroup();
+		initFromAttributes(context, attrs, defStyle);
+	}
+	
+	public void initTagsViewGroup() {
+	}
+	
+	public void initFromAttributes(Context context, AttributeSet attrs, int defStyle) {
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TagsViewGroup, 0, defStyle);
-		int hSpacing = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_horizontalSpacing, mHorizontalSpacing);
-		setHorizontalSpacing(hSpacing);
-		int vSpacing = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_verticalSpacing, mVerticalSpacing);
-		setVerticalSpacing(vSpacing);
-		int padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_padding, 0);
-		if(padding > 0) {
-			mTopPadding = mBottomPadding = mRightPadding = mLeftPadding = padding;
-		}
-		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingLeft, 0);
-		if(padding > 0) {
-			mLeftPadding = padding;
-		}
-		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingRight, 0);
-		if(padding > 0) {
-			mRightPadding = padding;
-		}
-		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingTop, 0);
-		if(padding > 0) {
-			mTopPadding = padding;
-		}
-		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingBottom, 0);
-		if(padding > 0) {
-			mBottomPadding = padding;
-		}
-		this.setPadding(mLeftPadding, mTopPadding, mRightPadding, mBottomPadding);
 
-		padding = a.getInt(R.styleable.TagsViewGroup_minRows, MIN_ROWS);
-		if(padding > 0) {
-			mMinRows = padding;
+		final int N = a.getIndexCount();
+		for(int i = 0; i < N; ++i) {
+			int attr = a.getIndex(i);
+			int value;
+			switch (attr) {
+			case R.styleable.TagsViewGroup_horizontalSpacing:
+				value = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_horizontalSpacing, mHorizontalSpacing);
+				if(value > 0)
+					setHorizontalSpacing(value);
+				break;
+			case R.styleable.TagsViewGroup_verticalSpacing:
+				value = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_verticalSpacing, mVerticalSpacing);
+				if(value > 0)
+					setVerticalSpacing(value);
+				break;
+			case R.styleable.TagsViewGroup_minRows:
+				value = a.getInt(R.styleable.TagsViewGroup_minRows, MIN_ROWS);
+				if(value > 0)
+					setMinimumRows(value);
+				break;
+			default:
+				break;
+			}
 		}
+		
 		a.recycle();
+		int i = this.getPaddingTop();
+		i = this.getPaddingBottom();
+		i = this.getPaddingLeft();
+		i = this.getPaddingRight();
+
+		i = params.bottomMargin;
+		i = params.topMargin;
+		i = params.leftMargin;
+		i = params.rightMargin;
+
+	
 	}
 	
 	public void setHorizontalSpacing(int hSpacing) {
@@ -104,7 +121,7 @@ public class TagsViewGroup extends ViewGroup {
 	public void setAdapter(ListAdapter adapter) {
 		mAdapter = adapter;
 		
-		this.removeAllViewsInLayout();
+		this.removeAllViews();
 		if(mAdapter == null) return ;
 		
 		int items = mAdapter.getCount();
@@ -116,13 +133,18 @@ public class TagsViewGroup extends ViewGroup {
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 				mTextHeight = tv.getMeasuredHeight();
 			}
-			Assert.assertTrue(this.addViewInLayout(tv, i, PARAMS, true));
+			this.addView(tv, i, params);
 		}
 		requestLayout();
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		mPaddingTop = getPaddingTop();
+		mPaddingBottom = getPaddingBottom();
+		mPaddingLeft = getPaddingLeft();
+		mPaddingRight = getPaddingRight();
+		
 		//super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		int widthMode = MeasureSpec.getMode(widthMeasureSpec);
 		int heightMode = MeasureSpec.getMode(heightMeasureSpec);
@@ -147,12 +169,12 @@ public class TagsViewGroup extends ViewGroup {
 				if((i+1) < ccount)
 					children_width += mHorizontalSpacing;
 			}
-			measuredHeight = mTopPadding + mTextHeight + mBottomPadding;
-			measuredWidth = children_width + mLeftPadding + mRightPadding;
+			measuredHeight = mPaddingTop + mTextHeight + mPaddingBottom;
+			measuredWidth = children_width + mPaddingLeft + mPaddingRight;
 		} else {	// MeasureSpec.AT_MOST or MeasureSpec.EXACTLY 
 			measuredWidth = widthSize; // use the max allowed
-			int right = widthSize - mRightPadding -1; 
-			int next_pos = mLeftPadding;
+			int right = widthSize - mPaddingRight -1; 
+			int next_pos = mPaddingLeft;
 			int row = 0;
 			int width = 0;
 			int ccount = this.getChildCount();
@@ -161,7 +183,7 @@ public class TagsViewGroup extends ViewGroup {
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 				width = tv.getMeasuredWidth();
 				if(next_pos + width >= right) {
-					next_pos = mLeftPadding;
+					next_pos = mPaddingLeft;
 					++row; 
 				}
 				next_pos += width + mHorizontalSpacing;
@@ -171,7 +193,7 @@ public class TagsViewGroup extends ViewGroup {
 			case MeasureSpec.AT_MOST:
 				// Log.d(TAG, "heightMode: AT_MOST");
 				children_height = rows_written * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
-				measuredHeight = children_height + mTopPadding + mBottomPadding;
+				measuredHeight = children_height + mPaddingTop + mPaddingBottom;
 				measuredHeight = (measuredHeight > heightSize) ? heightSize : measuredHeight;
 				break;
 			case MeasureSpec.EXACTLY:
@@ -183,7 +205,7 @@ public class TagsViewGroup extends ViewGroup {
 				if(rows_written < mMinRows)
 					rows_written = mMinRows;
 				children_height = row * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
-				measuredHeight = children_height + mTopPadding + mBottomPadding;
+				measuredHeight = children_height + mPaddingTop + mPaddingBottom;
 				break;
 			default:
 				break;
@@ -198,17 +220,17 @@ public class TagsViewGroup extends ViewGroup {
 	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		int pos = mLeftPadding;
+		int pos = mPaddingLeft;
 		int row = 0;
-		r -= mRightPadding;
+		r -= mPaddingRight;
 		for(int i = 0; i < this.getChildCount(); ++i) {
 			TextView tv = (TextView) this.getChildAt(i);
 			int width = tv.getMeasuredWidth();
 			if((pos + width) >= r) {
-				pos = mLeftPadding;
+				pos = mPaddingLeft;
 				++row; 
 			}
-			int child_top = mTopPadding + row * (mTextHeight + mVerticalSpacing);
+			int child_top = mPaddingTop + row * (mTextHeight + mVerticalSpacing);
 			tv.layout(pos, child_top, pos + width, child_top + mTextHeight);
 			pos += width + mHorizontalSpacing;
 		}
