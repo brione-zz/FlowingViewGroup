@@ -3,8 +3,6 @@
  */
 package com.eyebrowssoftware.example.fvg;
 
-import com.example.fvg.R;
-
 import junit.framework.Assert;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -21,6 +19,8 @@ import android.widget.TextView;
 public class TagsViewGroup extends ViewGroup {
 	private static final String TAG = "TagsAdapterView";
 	
+	private static final int MIN_ROWS = 2;
+	
 	private ListAdapter mAdapter;
 	private int mHorizontalSpacing = 0;
 	private int mVerticalSpacing = 0;
@@ -29,8 +29,9 @@ public class TagsViewGroup extends ViewGroup {
 	private int mBottomPadding;
 	private int mLeftPadding;
 	private int mRightPadding;
-	private static final int DEFAULT_MIN_ROW_INDEX = 1;
+	private int mMinRows;
 
+	
 	private static final ViewGroup.LayoutParams PARAMS = 
 		new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT); 
 
@@ -45,32 +46,37 @@ public class TagsViewGroup extends ViewGroup {
 
 	public TagsViewGroup(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_example_fvg_TagsViewGroup, 0, defStyle);
-		int hSpacing = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_horizontalSpacing, mHorizontalSpacing);
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TagsViewGroup, 0, defStyle);
+		int hSpacing = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_horizontalSpacing, mHorizontalSpacing);
 		setHorizontalSpacing(hSpacing);
-		int vSpacing = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_verticalSpacing, mVerticalSpacing);
+		int vSpacing = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_verticalSpacing, mVerticalSpacing);
 		setVerticalSpacing(vSpacing);
-		int padding = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_padding, 0);
+		int padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_padding, 0);
 		if(padding > 0) {
 			mTopPadding = mBottomPadding = mRightPadding = mLeftPadding = padding;
 		}
-		padding = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_paddingLeft, 0);
+		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingLeft, 0);
 		if(padding > 0) {
 			mLeftPadding = padding;
 		}
-		padding = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_paddingRight, 0);
+		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingRight, 0);
 		if(padding > 0) {
 			mRightPadding = padding;
 		}
-		padding = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_paddingTop, 0);
+		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingTop, 0);
 		if(padding > 0) {
 			mTopPadding = padding;
 		}
-		padding = a.getDimensionPixelOffset(R.styleable.com_example_fvg_TagsViewGroup_android_paddingBottom, 0);
+		padding = a.getDimensionPixelOffset(R.styleable.TagsViewGroup_paddingBottom, 0);
 		if(padding > 0) {
 			mBottomPadding = padding;
 		}
 		this.setPadding(mLeftPadding, mTopPadding, mRightPadding, mBottomPadding);
+
+		padding = a.getInt(R.styleable.TagsViewGroup_minRows, MIN_ROWS);
+		if(padding > 0) {
+			mMinRows = padding;
+		}
 		a.recycle();
 	}
 	
@@ -84,6 +90,11 @@ public class TagsViewGroup extends ViewGroup {
 		if(vSpacing < 0)
 			vSpacing = 0;
 		mVerticalSpacing = vSpacing;
+	}
+	
+	public void setMinimumRows(int minRows) {
+		if(minRows > 0)
+			mMinRows = minRows;
 	}
 	
 	public ListAdapter getAdapter() {
@@ -155,10 +166,11 @@ public class TagsViewGroup extends ViewGroup {
 				}
 				next_pos += width + mHorizontalSpacing;
 			}
+			int rows_written = ++row;
 			switch(heightMode){
 			case MeasureSpec.AT_MOST:
 				// Log.d(TAG, "heightMode: AT_MOST");
-				children_height = (row + 1) * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
+				children_height = rows_written * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
 				measuredHeight = children_height + mTopPadding + mBottomPadding;
 				measuredHeight = (measuredHeight > heightSize) ? heightSize : measuredHeight;
 				break;
@@ -168,9 +180,9 @@ public class TagsViewGroup extends ViewGroup {
 				break;
 			case MeasureSpec.UNSPECIFIED:
 				// Log.d(TAG, "heightMode: UNSPECIFIED");
-				if(row < 1)
-					++row;
-				children_height = (row + 1) * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
+				if(rows_written < mMinRows)
+					rows_written = mMinRows;
+				children_height = row * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
 				measuredHeight = children_height + mTopPadding + mBottomPadding;
 				break;
 			default:
