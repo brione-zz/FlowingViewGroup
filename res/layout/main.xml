@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:padding="0dp"
     >
 	<TextView  
 	    android:layout_width="fill_parent" 
@@ -14,9 +15,7 @@
 		android:id="@+id/tags"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:padding="10dp"
-		android:layout_margin="10dp"
-		style="tags"
+		style="@style/tags"
 	/>
 	<TextView  
 	    android:layout_width="fill_parent" 
