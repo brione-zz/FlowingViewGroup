@@ -1,5 +1,7 @@
 package com.eyebrowssoftware.example.fvg;
 
+import java.util.LinkedList;
+
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,9 +17,19 @@ public class FlowingViewGroup extends ListActivity {
         setContentView(R.layout.main);
         
         TagsViewGroup tvg = (TagsViewGroup) findViewById(R.id.tags);
-        ArrayAdapter<String> saa = new ArrayAdapter<String>(this, R.layout.text_view, mTitles1);
+        ArrayAdapter<String> saa = new ArrayAdapter<String>(this, R.layout.text_view, mTitles);
         tvg.setAdapter(saa);
-        ArrayAdapter<String[]> saaa = new ArrayAdapter<String[]>(this, R.layout.tags_view_group, mLibraries) {
+        // Build variations on the titles array to fill the ListView
+        LinkedList<String[]> mLibraries = new LinkedList<String[]>();
+        for(int i = 0; i < mTitles.length; ++i) {
+        	LinkedList<String> sl = new LinkedList<String>();
+        	for(int j = i; j < mTitles.length; ++j) {
+        		sl.add(mTitles[j]);
+        	}
+        	String[] empty = {};
+        	mLibraries.add(sl.toArray(empty));
+        }
+       ArrayAdapter<String[]> saaa = new ArrayAdapter<String[]>(this, R.layout.tags_view_group, mLibraries) {
         	
         	@Override
         	public View getView(int position, View convertView, ViewGroup parent) {
@@ -35,7 +47,7 @@ public class FlowingViewGroup extends ListActivity {
         this.setListAdapter(saaa);
     }
 
-    private static final String[] mTitles1 = 
+    private static final String[] mTitles = 
     {
         "Henry IV (1)",   
         "Henry V",
@@ -52,80 +64,4 @@ public class FlowingViewGroup extends ListActivity {
         "Strangers in Paradise",
     };
     
-    private static final String[] mTitles2 = 
-    {
-        "Henry V",
-        "Henry VIII",       
-        "Richard II",
-        "Richard III",
-        "Merchant of Venice",  
-        "Othello",
-        "King Lear",
-        "A Path with Heart",
-        "Transmetropolitan",
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[] mTitles3 = 
-    {
-        "Henry VIII",       
-        "Richard II",
-        "Richard III",
-        "Merchant of Venice",  
-        "Othello",
-        "King Lear",
-        "A Path with Heart",
-        "Transmetropolitan",
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[] mTitles4 = 
-    {
-        "Richard III",
-        "Merchant of Venice",  
-        "Othello",
-        "King Lear",
-        "A Path with Heart",
-        "Transmetropolitan",
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[] mTitles5 = 
-    {
-        "Othello",
-        "King Lear",
-        "A Path with Heart",
-        "Transmetropolitan",
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[] mTitles6 = 
-    {
-        "A Path with Heart",
-        "Transmetropolitan",
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[] mTitles7 = 
-    {
-        "Fables",
-        "Jack of Fables",
-        "Strangers in Paradise",
-    };
-    
-    private static final String[][] mLibraries = {
-    	mTitles1, mTitles2, mTitles3, mTitles4, mTitles5, mTitles6, mTitles7,
-    };
-	
-
 }
