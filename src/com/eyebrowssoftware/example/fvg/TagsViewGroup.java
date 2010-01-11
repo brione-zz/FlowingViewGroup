@@ -3,19 +3,21 @@
  */
 package com.eyebrowssoftware.example.fvg;
 
+import java.util.Stack;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
-import android.widget.TextView;
 
 /**
  * @author Brion Emde
  *
  */
 public class TagsViewGroup extends ViewGroup {
+	@SuppressWarnings("unused")
 	private static final String TAG = "TagsAdapterView";
 	
 	private static final int MIN_ROWS = 2;
@@ -23,7 +25,7 @@ public class TagsViewGroup extends ViewGroup {
 	private ListAdapter mAdapter;
 	private int mHorizontalSpacing = 0;
 	private int mVerticalSpacing = 0;
-	private int mTextHeight = -1;
+	private int mViewHeight = -1;
 	private int mPaddingTop;
 	private int mPaddingBottom;
 	private int mPaddingLeft;
@@ -105,21 +107,26 @@ public class TagsViewGroup extends ViewGroup {
 	public ListAdapter getAdapter() {
 		return mAdapter;
 	}
+	
+	private Stack<View> tvs = new Stack<View>();
 
 	public void setAdapter(ListAdapter adapter) {
-		mAdapter = adapter;
+		if((mAdapter = adapter) == null) return;
 		
-		this.removeAllViews();
-		if(mAdapter == null) return ;
-		
+		// Cache any pre-existing children, from being recycled.
+		int ccount = this.getChildCount(); 
+		for(int i = 0; i < ccount; i++) {
+			tvs.push(this.getChildAt(i));
+		}
+		removeAllViews();
 		int items = mAdapter.getCount();
 		// Log.d(TAG, "Adapter count: " + String.valueOf(items));
 		for(int i = 0; i < items; ++i) {
-			TextView context = null;
-			TextView tv = (TextView) mAdapter.getView(i, context, this);
-			if(mTextHeight < 0) {
+			View context = (tvs.size() > 0) ? tvs.pop() : null;
+			View tv = mAdapter.getView(i, context, this);
+			if(mViewHeight < 0) {
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-				mTextHeight = tv.getMeasuredHeight();
+				mViewHeight = tv.getMeasuredHeight();
 			}
 			this.addView(tv, i, params);
 		}
@@ -155,6 +162,7 @@ public class TagsViewGroup extends ViewGroup {
 		int suggestedMinWidth = this.getSuggestedMinimumWidth();
 		int suggestedMinHeight = this.getSuggestedMinimumHeight();
 
+		@SuppressWarnings("unused")
 		int height = 0;
 		int width = 0;
 		
@@ -163,7 +171,7 @@ public class TagsViewGroup extends ViewGroup {
 			// we'll have a single row of tags, respecing the padding.
 			int ccount = this.getChildCount();
 			for(int i = 0; i < ccount; ++i) {
-				TextView tv = (TextView) this.getChildAt(i);
+				View tv = this.getChildAt(i);
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 				height = tv.getMeasuredHeight();
 				width = tv.getMeasuredWidth();
@@ -173,7 +181,7 @@ public class TagsViewGroup extends ViewGroup {
 					children_width += mHorizontalSpacing;
 			}
 			// Log.d(TAG, "-----------------------------------------");
-			measuredHeight = mPaddingTop + mTextHeight + mPaddingBottom;
+			measuredHeight = mPaddingTop + mViewHeight + mPaddingBottom;
 			measuredWidth = children_width + mPaddingLeft + mPaddingRight;
 		} else {	// MeasureSpec.AT_MOST or MeasureSpec.EXACTLY 
 			// Log.d(TAG, "Other");
@@ -183,7 +191,7 @@ public class TagsViewGroup extends ViewGroup {
 			int row = 0;
 			int ccount = this.getChildCount();
 			for(int i = 0; i < ccount; ++i) {
-				TextView tv = (TextView) this.getChildAt(i);
+				View tv = this.getChildAt(i);
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 				height = tv.getMeasuredHeight();
 				width = tv.getMeasuredWidth();
@@ -202,7 +210,7 @@ public class TagsViewGroup extends ViewGroup {
 			switch(heightMode){
 			case MeasureSpec.AT_MOST:
 				// Log.d(TAG, "heightMode: AT_MOST");
-				children_height = rows_written * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
+				children_height = rows_written * (mViewHeight + mVerticalSpacing) - mVerticalSpacing;
 				measuredHeight = children_height + mPaddingTop + mPaddingBottom;
 				measuredHeight = (measuredHeight > heightSize) ? heightSize : measuredHeight;
 				break;
@@ -214,7 +222,7 @@ public class TagsViewGroup extends ViewGroup {
 				// Log.d(TAG, "heightMode: UNSPECIFIED");
 				if(rows_written < mMinRows)
 					rows_written = mMinRows;
-				children_height = rows_written * (mTextHeight + mVerticalSpacing) - mVerticalSpacing;
+				children_height = rows_written * (mViewHeight + mVerticalSpacing) - mVerticalSpacing;
 				measuredHeight = children_height + mPaddingTop + mPaddingBottom;
 				break;
 			default:
@@ -242,14 +250,14 @@ public class TagsViewGroup extends ViewGroup {
 		int row = 0;
 		r -= mPaddingRight;
 		for(int i = 0; i < this.getChildCount(); ++i) {
-			TextView tv = (TextView) this.getChildAt(i);
+			View tv = this.getChildAt(i);
 			int width = tv.getMeasuredWidth();
 			int height = tv.getMeasuredHeight();
 			if((pos + width + mHorizontalSpacing) >= r) {
 				pos = mPaddingLeft;
 				++row; 
 			}
-			int child_top = mPaddingTop + row * (mTextHeight + mVerticalSpacing);
+			int child_top = mPaddingTop + row * (mViewHeight + mVerticalSpacing);
 			tv.layout(pos, child_top, pos + width, child_top + height);
 			// Log.d(TAG, "child: Top = " + String.valueOf(child_top) + "Bottom: " + String.valueOf(child_top+height) 
 			//		+ " Left = " + String.valueOf(pos) + " Right = " + String.valueOf(pos + width));
