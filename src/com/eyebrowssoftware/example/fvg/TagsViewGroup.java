@@ -122,8 +122,7 @@ public class TagsViewGroup extends ViewGroup {
 		int items = mAdapter.getCount();
 		// Log.d(TAG, "Adapter count: " + String.valueOf(items));
 		for(int i = 0; i < items; ++i) {
-			View context = (tvs.size() > 0) ? tvs.pop() : null;
-			View tv = mAdapter.getView(i, context, this);
+			View tv = mAdapter.getView(i, (tvs.empty()) ? null : tvs.pop(), this);
 			if(mViewHeight < 0) {
 				tv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
 				mViewHeight = tv.getMeasuredHeight();
