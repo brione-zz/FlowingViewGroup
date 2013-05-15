@@ -1,0 +1,4 @@
+Android example showing one way to do something like a grid view when you don't care of things end up in
+columns and just want to display a list of things.
+
+An example would be a list of keywords or modifiers of some sort.
