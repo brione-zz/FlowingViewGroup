@@ -247,6 +247,10 @@ public class TagsViewGroup extends ViewGroup {
 		
 		int pos = mPaddingLeft;
 		int row = 0;
+
+		// take horizontal margins into account
+		r -= l;
+		
 		r -= mPaddingRight;
 		for(int i = 0; i < this.getChildCount(); ++i) {
 			View tv = this.getChildAt(i);
